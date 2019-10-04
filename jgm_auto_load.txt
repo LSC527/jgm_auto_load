@@ -120,8 +120,8 @@ Function restart()
 	Tap 765, 409 '退出登录
 	Delay 3000
 	Tap 847,172 'QQ登录
-	Delay 3000
-	Tap 800, 290
+	Delay 4000
+	Tap 800, 290 '登陆
 	Delay 3000
 End Function
 
@@ -135,16 +135,16 @@ While True
 		FindColor cx(1), cy(1), cx(1) + 55, cy(1) + 55, "EAC254|FF989A|3CC1FF", 1, 1, cx1, cy1
 		If cx1 < 0  And cy1 < 0 Then
 			If n = iter - 1 Then 
-				avoid()
-				money()
-				upgrade (idx)
+				avoid() '避免家国之光打断
+				money() '收钱,注释掉此行后不进行收钱
+				upgrade (idx) '升级建筑，注释掉此行后不进行升级
 			Else 
 				Delay 1000
 			End If
 		Else 
-			res = loadtrain()
+			res = loadtrain() '卸货
 			If res = 1 Then 
-				restart()
+				restart() '重新登陆
 			End If
 		End If
 		n = n + 1
