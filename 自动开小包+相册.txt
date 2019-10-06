@@ -1,0 +1,55 @@
+//'实现自动开完所有小包和相册，不会消耗蓝币购买
+//'实现自动开完所有小包和相册，不会消耗蓝币购买
+//'实现自动开完所有小包和相册，不会消耗蓝币购买
+Tap 977, 349 '进入商店
+Delay 100
+
+While True '开小包
+	Dim x1, y1, x2, y2, x, y, cnt
+	x1 = 331 '小包剩余数量红色背景取色框
+	y1 = 406
+	x2 = 360
+	y2 = 415
+	cnt = 0
+	Rem ff1
+	FindColor x1, y1, x2, y2, "1C2BC6|1111BC", 0, 0.95, x, y
+	If x > -1 Then 
+		Tap 367,467 '小包坐标
+		Delay 500
+		Tap 558,287 '其他无影响位置坐标
+		Delay 500
+	Else 
+		cnt = cnt + 1
+		If cnt > 10 Then 
+			cnt = 0
+			Exit While
+		End If
+		Tap 558,287 '其他无影响位置坐标
+		Delay 500
+		Goto ff1
+	End If
+Wend
+	
+While True '开相册
+	x1 = 701 '相册剩余数量红色背景取色框
+	y1 = 228
+	x2 = 730
+	y2 = 238
+	cnt = 0
+	Rem ff2
+	FindColor x1, y1, x2, y2, "1F2ECB|1212BF", 0, 0.95, x, y
+	If x > -1 Then 
+		Tap 747, 301 '相册坐标
+		Delay 2000
+		Tap 558,287 '其他无影响位置坐标
+	Else 
+		cnt = cnt + 1
+		If cnt > 10 Then 
+			cnt = 0
+			Exit While
+		End If
+		Tap 558,287 '其他无影响位置坐标
+		Delay 500
+		Goto ff2
+	End If
+Wend
