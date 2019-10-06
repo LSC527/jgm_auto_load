@@ -93,7 +93,7 @@ Function loadtrain()
 			While True
 				TouchDown tx(i), ty(i)
 				Delay 500
-				FindColor 149, 39, 720, 525, "44E167|4AD566|7FFD8E", 1, 0.99, ax, ay '整个建筑区域取色
+				FindColor 149, 39, 720, 525, "44E167|4AD566|7FFD8E", 1, 0.98, ax, ay '整个建筑区域取色
 				If ax > -1 and ay > -1 Then
 					TouchMove ax, ay
 					Delay 100
