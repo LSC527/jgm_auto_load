@@ -1,0 +1,170 @@
+'模拟器：腾讯手游助手，适用分辨率设置：1024*576 DPI-160
+'
+Dim screen_X = GetScreenX(), screen_Y = GetScreenY()
+
+'原始坐标
+Dim train_x(), train_y(), house_x(), house_y(), i
+
+'从左到右，1到3
+For i = 1 To 3
+    train_x(i) = 350 + (i - 1) * 85 // 321 815
+    train_y(i) = 875 - (i - 1) * 45
+Next
+
+'从左到右，从下往上，1到9
+For i = 1 To 9
+    house_x(i) = 160 + ((i - 1) Mod 3) * 135
+    house_y(i) = 640 - ((i - 1) \ 3) * 140 - ((i - 1) Mod 3) * 70
+Next
+
+'转换坐标
+'小火车坐标
+Dim tx(), ty()
+For i = 1 To 3
+    tx(i) = train_y(i)
+    ty(i) = screen_Y - train_x(i)
+Next
+
+'房子坐标
+Dim x(), y()
+For i = 1 To 9
+    x(i) = house_y(i)
+    y(i) = screen_Y - house_x(i)
+Next
+
+
+//
+'升级大哥参数
+Dim idx = 9 '大哥标号
+//
+
+
+Dim editx = 610'修建按钮坐标
+Dim edity = 60
+Dim upgrx = 934'升级按钮坐标
+Dim upgry = 113
+
+'火车建筑气泡
+Dim cx(), cy()
+cx(1) = 788
+cy(1) = 226
+cx(2) = 747
+cy(2) = 141
+cx(3) = 699
+cy(3) = 59
+
+'收钱
+Function money()
+	For i=1 to 9
+		Tap x(i), y(i)
+	Delay 100
+	Next	
+End Function
+
+Function upgrade(idx)
+	'升级大哥
+	Tap editx, edity
+	Delay 100
+	Tap x(idx), y(idx) '大哥
+	Delay 300
+	Tap upgrx, upgry
+	Delay 300
+	Tap editx, edity
+	Delay 100
+End Function
+
+Function avoid()
+	Delay 100
+	'避免家国之光
+	Dim jsx, jsy
+	jsx = 978'建设按钮坐标
+	jsy = 483
+	Tap jsx, jsy
+	Delay 100
+End Function
+
+Function loadtrain()
+	Dim ssx(), ssy(), ax, ay, flag
+	flag = 0
+	For i = 1 To 3
+		FindColor cx(i), cy(i), cx(i) + 55, cy(i) + 55, "3CC1FF", 1, 1, ssx(i), ssy(i)
+//		ssx(i) = 1 '收所有，注释掉后只收橙色
+		If ssx(i) > - 1  Then 
+			While True
+				TouchDown tx(i), ty(i)
+				Delay 500
+				FindColor 149, 39, 720, 525, "44E167|4AD566|7FFD8E", 1, 0.99, ax, ay '整个建筑区域取色
+				If ax > -1 and ay > -1 Then
+					TouchMove ax, ay
+					Delay 100
+					TouchUp 
+					Delay 100
+					cnt = cnt + 1
+				Else 
+					TouchUp
+					Delay 100
+					Goto xx
+				End If
+			Wend
+		End If
+		Rem xx
+	Next
+	FindColor cx(2), cy(2), cx(2) + 55, cy(2) + 55, "EAC254|FF989A|3CC1FF", 1, 1, hasx(2), hasy(2)
+	FindColor cx(3), cy(3), cx(3) + 55, cy(3) + 55, "EAC254|FF989A|3CC1FF", 1, 1, hasx(3), hasy(3)
+	For i = 1 To 3
+		If hasx(i) > 0 Then 
+			If ssx(i) < 0 Then 
+				flag = 1
+			End If		
+		End If
+	Next
+	loadtrain = flag
+End Function
+
+Function restart()
+	Tap 44, 536 '头像
+	Delay 100
+	Tap 765, 409 '退出登录
+	Delay 2000
+	Tap 827, 175 'QQ登录
+	Delay 2000
+	Tap 827, 175 '登陆
+	Delay 2000
+	Tap 827, 175 '避免重登失效
+	Delay 2000
+	Tap 827, 175 '避免重登失效
+	Delay 2000
+	Tap 827, 175 '避免重登失效
+	Delay 2000
+	Tap 827, 175 '避免重登失效
+	Delay 2000
+	//注：微信登陆时，将以上所有827, 175改为827, 400即可
+End Function
+
+
+Dim cnt = 0
+While True
+	Dim n = 1
+	Dim iter = 120
+	While n < iter
+		Dim res
+		Dim hasx(),hasy()
+		FindColor cx(1), cy(1), cx(1) + 55, cy(1) + 55, "EAC254|FF989A|3CC1FF", 1, 1, hasx(1), hasy(1)
+		If hasx(1) < 0  And hasy(1) < 0 Then
+			If n = iter - 1 Then 
+				avoid() '避免家国之光
+//				money() '收钱
+//				upgrade (idx) '升级大哥
+			Else 
+				Delay 1000
+			End If
+		Else 
+			res = loadtrain()
+			TracePrint "已收货数量:"&cnt
+			If res = 1 Then 
+				restart()
+			End If
+		End If
+		n = n + 1
+	Wend
+Wend
