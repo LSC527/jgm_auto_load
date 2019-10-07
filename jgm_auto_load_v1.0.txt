@@ -1,4 +1,4 @@
-'模拟器：腾讯手游助手，适用分辨率设置：1024*576 DPI-160
+﻿'模拟器：腾讯手游助手，适用分辨率设置：1024*576 DPI-160
 '
 Dim screen_X = GetScreenX(), screen_Y = GetScreenY()
 
@@ -43,6 +43,23 @@ Dim editx = 610'修建按钮坐标
 Dim edity = 60
 Dim upgrx = 934'升级按钮坐标
 Dim upgry = 113
+Dim setx = 934'更换按钮坐标
+Dim sety = 282
+Dim set1x = 430'更换建筑的第一个建筑位
+Dim set1y = 355
+Dim set2x = 650'更换建筑的第二个建筑位
+Dim set2y = 355
+Dim set3x = 840'更换建筑的第三个建筑位
+Dim set3y = 355
+Dim unavailx = 900'建设无效位 
+Dim unavaily = 560
+Dim swipHx = 852'下拉起点位
+Dim swipHy = 280
+Dim swipTx = 285'下拉末点位
+Dim swipTy = 274
+// 在这里手动调整需要替换的建筑
+// 格式 Array(Array(建筑位1~9, 替换建筑所在的建筑列表位1~7), ...)
+Dim resetList = Array(Array(7, 1),Array(4, 1),Array(1, 1),Array(2, 1),Array(7, 1),Array(4, 3),Array(1, 2),Array(2, 6))
 
 '火车建筑气泡
 Dim cx(), cy()
@@ -141,6 +158,55 @@ Function restart()
 	//注：微信登陆时，将以上所有827, 175改为827, 416即可
 End Function
 
+Function reset()
+	i = 0
+	While resetList(i) <> Null
+    	Dim arr = resetList(i)
+    	do_reset arr(0), arr(1)
+    	i = i + 1
+	Wend
+	Tap unavailx, unavaily
+	Delay 1000
+	Tap editx, edity
+	Delay 500
+End Function
+
+Function do_reset(resetid, house)
+	Tap editx, edity
+	Delay 500
+	Tap x(resetid), y(resetid)
+	Delay 500
+	Tap setx, sety
+	Delay 500
+	Select Case house
+	Case 1
+    	Tap set1x, set1y
+	Case 2
+    	Tap set2x, set2y
+    Case 3
+    	Tap set3x, set3y
+    Case 5
+    	do_swip 
+    	Delay 1000
+    	Tap set1x, set1y
+    Case 6
+    	do_swip 
+    	Delay 1000
+    	Tap set2x, set2y
+    Case 7
+    	do_swip 
+    	Delay 1000
+    	Tap set3x, set3y
+	Case Else
+    	Delay 200 
+	End Select
+
+	Delay 1500
+End Function
+
+Function do_swip()
+	Swipe swipHx, swipHy, swipTx, swipTy
+End Function
 
 Dim cnt = 0
 While True
@@ -162,7 +228,8 @@ While True
 			res = loadtrain()
 			TracePrint "已收货数量:"&cnt
 			If res = 1 Then 
-				restart()
+				// restart()
+				reset()
 			End If
 		End If
 		n = n + 1
