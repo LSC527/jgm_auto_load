@@ -1,0 +1,41 @@
+//'实现自动开完所有小包和相册，不会消耗蓝币购买
+//'适用于云手机720*1260分辨率
+//'可选开小包，中包，相册 
+//'by  NGA 阿尔斯·费尔斯通
+
+delay 5000
+Tap 350, 1200 '进入商店
+Delay 100
+
+dim bx=360, by=660
+dim p={610, 1010, 640, 1030}
+dim r1={170, 560, 200, 580} '小包剩余数量
+dim r2={400, 560, 430, 580} '中包剩余数量
+Dim x, y, cnt
+
+function openbag (bag, color)
+While True '开小包
+cnt = 0
+Rem ffr
+FindColor bag(0), bag(1), bag(2), bag(3), color, 0, 0.95,x, y
+If x > -1 Then
+Tap bag(0), bag(1) '小包坐标
+Delay 500
+Tap bx, by '其他无影响位置坐标
+Delay 500
+Else
+cnt = cnt + 1
+If cnt > 10 Then
+cnt = 0
+Exit While
+End If
+Tap bx, by '其他无影响位置坐标
+Delay 500
+Goto ffr
+End If
+Wend
+end function
+
+openbag(r1, "8ED142|89C832") '开小红包
+openbag(r2, "8ED142|89C832") '开中红包
+openbag(p, "81A92D|81A82B") '开相册
