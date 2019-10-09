@@ -1,0 +1,155 @@
+'云手机，适用分辨率设置： 720*1080
+'作者NGA 阿尔斯·费尔斯通，代码参考自NGA Fitztech 模拟器代码
+'云手机，适用分辨率设置： 720*1080
+'代码参考自nga fetztech 模拟器代码
+ '房子坐标 
+Dim hx() ={180, 360, 540, 180, 360, 540, 180, 360, 540}
+Dim hy() ={870, 760, 680, 690, 580, 500, 510, 400, 320}
+ '小火车坐标
+Dim tx() ={430, 530, 630}
+Dim ty() ={1100, 1040, 980}
+
+Dim edit = {630, 780} '修建按钮坐标 
+Dim upgr = {600, 1200} '升级按钮坐标
+Dim chan = {360, 1200} '替换按钮坐标
+dim id=8 '指定升级建筑id，从左至右，从下到上依次为0～8
+
+Function money() 	'收钱 
+    For i=0 to 8		
+           Tap hx(i), hy(i) 	
+    Delay 1000 	
+    Next	 
+End Function 
+
+Function upgrade(id) 	'升级大哥 	
+  Tap edit(0), edit(1)
+  Delay 100 	
+  Tap hx(id), hy(id ) '大哥 
+  Delay 500 
+	Tap upgr(0), upgr(1)
+	Delay 300 	
+  Tap edit(0), edit(1) 	
+  Delay 100 
+End Function
+
+Function loadtrain() 	'卸货
+  Dim ssx, ssy, sbx,sby,ax, ay, flag 	
+  flag = 0 	
+For i = 0 To 2 
+//		ssx = 1 '收所有	
+
+//    只收橙色，判断是否有紫色蓝色
+    FindColor tx(i)-50, ty(i) -100, tx(i), ty(i) - 50, "3CC1FF", 1, 1, ssx, ssy 
+    FindColor tx(i)-50, ty(i)-100, tx(i), ty(i) -50, "EAC254|FF989A", 1, 1, sbx, sby
+
+//只收橙色紫色，判断是否有蓝色
+//    FindColor tx(i)- 50, ty(i) -100, tx(i), ty( i)-50,"3CC1FF|FF989A",1,1, ssx, ssy
+//    FindColor tx(i)-50, ty(i)-100, tx(i), ty(i) -50, "EAC254", 1, 1, sbx, sby
+   If sbx > - 1 Then    
+		 			flag = 1
+    end if
+	  If ssx > - 1 Then 			
+           While True 			
+	               TouchDown tx(i), ty(i) 				
+                  Delay 500 			
+	                FindColor 90, 170, 630, 870, "44E167|4AD566|7FFD8E", 1, 0.98, ax, ay
+ 				If ax > -1 and ay > -1 Then
+ 					TouchMove ax, ay
+ 					Delay 100
+ 					TouchUp
+ 					Delay 100
+ 				Else
+ 					TouchUp
+ 					Delay 100
+ 					Goto xx
+ 				End If
+ 			Wend
+ 		End If
+ 		Rem xx
+ 	Next
+ 	loadtrain = flag
+ End Function
+
+Dim package = "com.tencent.jgm"
+Function RestartGame() '重启游戏
+TracePrint "重启游戏"
+Delay 500
+KillApp package
+Delay 1000
+RunApp package
+Delay 5000
+End Function
+
+'凌晨重启-注意模拟器时间要与实际之间一致
+Function MidNightRestart()
+  Dim hourNow = datetime.hour()
+  Dim minuteNow = datetime.minute()
+
+  If hourNow = 0 and minuteNow <= 3 Then
+TracePrint "当前时间:",hourNow,"时",minuteNow,"分,重启家国梦"
+    RestartGame() '杀后台
+  End If
+End Function
+
+function strategy() '升级政策
+tap 160, 160
+delay 1000
+while true
+    FindColor 80, 400, 430, 700,  "03fe01|07fc07", 0, 0.98, stx, sty
+  if stx < 0 then
+        touchdown 360, 800
+        delay 500
+        touchmove 360, 480
+        delay 300
+        touchup
+        delay 500
+    else
+        delay 500
+        tap stx+100, sty+60
+        delay 1000
+        tap 360, 800
+        delay 500
+tap 120, 1200
+delay 500
+tap 120, 1200
+        exit while
+    end if
+wend
+end function
+
+'主程序
+ While True
+ 	     Dim m=1, n = 1
+     	Dim iter = 120
+
+     	While n < iter
+ 	        	Dim res
+ 		       Dim cx1, cy1, stx, sty
+            MidNightRestart()     
+             delay 1000 
+                FindColor 180, 120, 240, 180, "00d900" , 0, 0.98, stx, sty
+                if stx > -1 then
+                   strategy()
+                end if
+
+ 		       FindColor tx(0)-50, ty(0)-100, tx(0), ty(0) -50, "EAC254|FF989A|3CC1FF", 1, 1, cx1, cy1
+           If cx1<0 And cy1< 0  Then
+                 m=m+1
+ 			          If n = iter - 1 Then
+                      tap 120, 1200 '增加容错率，防止 弹出 通知 卡死
+				             money ()'收钱,注释掉此行后不进行收钱             
+			               upgrade (id) '升级建筑，注释掉此行后不进行升级
+ 			         Else
+ 				             Delay 1000
+ 			         End If
+ 		      Else
+ 			          res = loadtrain() '卸货
+ 			          If res = 1 Then  	
+  	                   RestartGame() '重新登陆
+ 			          End If
+ 		       End If
+ 		       n = n + 1
+ 	    Wend
+Wend
+
+
